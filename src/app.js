@@ -1,10 +1,10 @@
 require("dotenv").config();
 const express = require('express');
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+console.log("stripe", stripe);
 const jwt = require("jsonwebtoken") ;
 const app  = express() ;
 const port = process.env.PORT || 4000; 
-const mongoose = require("mongoose").set("strictQuery", true);
 const mongoDB_url = process.env.mongodb_url;
 const cors = require("cors") ; 
 app.use(express.json()) ;
@@ -19,8 +19,6 @@ if(client){
 }
 const booksCollection = client.db("book-store").collection("books");
 const usersCollection = client.db("book-store").collection("users");
-
-// database connection end with mongoDB   
 
 //verify token
 const verifyToken = (req , res , next ) => { 
@@ -193,9 +191,13 @@ app.get("/bookData/:id" , async (req ,res) => {
        ]
     });
 
-    res.send({
-       clientSecret: paymentIntent.client_secret,
-    });
+    if(verifyToken === "[Function: verifyToken]"){
+     return res.status(403).send({error:"Please login again"})
+    }else{
+   return  res.send({
+      clientSecret: paymentIntent.client_secret,
+   });
+    }
  });
 
 
@@ -217,4 +219,3 @@ app.get("/bookData/:id" , async (req ,res) => {
   
 
   
-
